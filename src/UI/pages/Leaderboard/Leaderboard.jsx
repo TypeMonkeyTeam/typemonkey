@@ -5,6 +5,8 @@ import Delete from "../../assets/icons/Delete";
 import LeaderboardPopup from "../../popups/LeaderboardPopup/LeaderboardPopup";
 import { usePopup } from "../../context/PopupContext/PopupProvider";
 import { useUser } from "../../context/UserContext/UserProvider";
+import { get, del} from "../../hooks/requests";
+import { API_ROUTES } from "../../hooks/routes";
 
 const SortingPanel = ({
   activeMetric,
@@ -67,7 +69,7 @@ const LeaderboardRow = ({
   onDelete,
   onClick,
 }) => {
-  const isCurrentUser = record.user_id === currentUserId;
+  const isCurrentUser = record.userId === currentUserId;
 
   return (
     <div
@@ -123,8 +125,10 @@ const LeaderboardPanel = ({ records, currentUserId, onDelete }) => {
           <span>#</span>
         </div>
         <div className="records">
-          {records.map((record, index) => (
-            <LeaderboardRow
+          {records.map((record, index) => {
+            console.log(record);
+            
+            return <LeaderboardRow
               key={record.id}
               record={record}
               index={index}
@@ -132,7 +136,7 @@ const LeaderboardPanel = ({ records, currentUserId, onDelete }) => {
               onDelete={onDelete}
               onClick={() => handleRowClick(record, index)}
             />
-          ))}
+           })}
         </div>
       </div>
     </div>
@@ -150,18 +154,20 @@ const Leaderboard = () => {
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      const res = await window.api.call("getLeaderboardRecords", [
-        activeTime,
-        activeLang,
-        activeMetric,
-      ]);
-
-      if (res.success) {
-        setUserRecords(res.data);
-      } else {
-        console.error("Ошибка загрузки рекордов:", res.error);
+      try {
+        const endpoint = `${API_ROUTES.leaderboard.all}?&time=${activeTime}&language=${activeLang}&metric=${activeMetric}`;
+        const res = await get(endpoint);
+        
+        if(res.success) {
+          setUserRecords(res.data ?? []);
+        } else  {
+          console.error("Ошибка загрузки лидерборда:", res.error);
+        }
+      } catch (error) {
+        console.error("Сетеой сбой:", error);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
 
     fetchData();
@@ -169,7 +175,7 @@ const Leaderboard = () => {
 
   const handleDelete = async (recordId) => {
     try {
-      const res = await window.api.call("deleteRecord", [recordId]);
+      const res = await del(API_ROUTES.leaderboard.delete(recordId)); 
       console.log("Результат удаления:", res);
 
       if (!res.success) {
@@ -177,10 +183,10 @@ const Leaderboard = () => {
         return;
       }
 
-      // Удаляем из списка
       setUserRecords((prev) => prev.filter((r) => r.id !== recordId));
     } catch (err) {
       console.error("Ошибка удаления:", err);
+      alert("Не удалось удалить запись.");
     }
   };
 

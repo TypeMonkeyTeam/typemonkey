@@ -2,22 +2,23 @@ import React, { useState, useEffect, useContext } from "react";
 import { UserContext } from "./UserContext";
 import { useNavigate } from "react-router-dom";
 import Avatar from "../../assets/avatar.png";
-
+import { post } from "../../hooks/requests";
+import {API_ROUTES} from "../../hooks/routes";
 export const UserProvider = ({ children }) => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
 
   useEffect(() => {
     const saved = localStorage.getItem("user");
-    console.log(JSON.parse(saved))
     saved ? setUser(JSON.parse(saved)) : navigate("/");
   }, []);
 
   const login = async (userData) => {
-    const response = await window.api.call("loginUser", [
-      userData.email,
-      userData.password,
-    ]);
+    const response = await post(API_ROUTES.auth.login, {
+      email: userData.email,
+      password: userData.password,
+    });
+  
     if (response.success) {
       const userObj = {
         id: response.data.id,
@@ -27,18 +28,21 @@ export const UserProvider = ({ children }) => {
       localStorage.setItem("user", JSON.stringify(userObj));
       setUser(userObj);
       navigate("/main");
+    } else {
+      console.error("Ошибка логина:", response.error);
     }
-    return response.status;
+  
+    return response;
   };
 
   const register = async (userData) => {
     const name = userData.email.split("@")[0];
-    const response = await window.api.call("registerUser", [
+    const response = await post(API_ROUTES.auth.register, {
       name,
-      userData.email,
-      userData.password,
-      Avatar,
-    ]);
+      email: userData.email,
+      password: userData.password,
+      avatar: Avatar,
+    });
     if (response.success) {
       const userObj = {
         id: response.data.id,
@@ -48,6 +52,8 @@ export const UserProvider = ({ children }) => {
       localStorage.setItem("user", JSON.stringify(userObj));
       setUser(userObj);
       navigate("/main");
+    } else {
+      console.error("Ошибка регистрации:", response.error);
     }
     return response.status;
   };

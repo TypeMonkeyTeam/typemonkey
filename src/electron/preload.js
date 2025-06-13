@@ -1,10 +1,6 @@
-const { contextBridge, ipcRenderer } = require('electron');
+import { contextBridge, ipcRenderer } from "electron";
 
-contextBridge.exposeInMainWorld('WindowAPI', {
-  closeWin: () => ipcRenderer.send('window-close'),
-  minimizeWin: () => ipcRenderer.send('window-minimize'),
-});
-
-contextBridge.exposeInMainWorld('api', {
-  call: (method, args = []) => ipcRenderer.invoke('api-call', { method, args }),
+contextBridge.exposeInMainWorld("electronAPI", {
+  closeWindow: () => ipcRenderer.send("window-close"),
+  minimizeWindow: () => ipcRenderer.send("window-minimize"),
 });

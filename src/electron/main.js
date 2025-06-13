@@ -2,7 +2,6 @@ import { app, BrowserWindow, ipcMain } from "electron";
 import path from "path";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
-import * as db from '../backend/db.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -18,15 +17,16 @@ function createWindow() {
     frame: false,
     icon: path.join(__dirname, "..", "..", "public", "monkey.png"),
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
       nodeIntegration: false,
+      preload: path.join(__dirname, "preload.js"),
     },
   });
+
   win.loadURL("http://localhost:5173");
 }
 
-app.setName('TypeMonkey');
+app.setName("TypeMonkey");
 
 app.whenReady().then(() => {
   createWindow();
@@ -43,33 +43,9 @@ app.on("window-all-closed", () => {
 });
 
 ipcMain.on("window-close", () => {
-  if (win) win.close()
+  if (win) win.close();
 });
 
 ipcMain.on("window-minimize", () => {
   if (win) win.minimize();
 });
-
-ipcMain.handle('api-call', async (_event, { method, args }) => {
-  try {
-    if (!db[method] || typeof db[method] !== 'function') {
-      return {
-        success: false,
-        status: 404,
-        error: `Метод '${method}' не найден`,
-        data: null,
-      };
-    }
-
-    return await db[method](...args);
-  } catch (err) {
-    console.error(`Ошибка в ${method}:`, err);
-    return {
-      success: false,
-      status: 500,
-      error: err.message || 'Неизвестная ошибка',
-      data: null,
-    };
-  }
-});
-

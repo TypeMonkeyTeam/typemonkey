@@ -5,18 +5,14 @@
   "type": "module",
   "productName": "TypeMonkey",
   "icon": "/public/monkey.png",
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview",
-    "start:build": "docker build -t typemonkey-db ./db",
-    "start:db": "sh -c \"docker inspect typemonkey-db > /dev/null 2>&1 && docker start typemonkey-db || docker run -d -p 5432:5432 --name typemonkey-db typemonkey-db\"",
-    "stop:db": "docker stop typemonkey-db || true && docker rm typemonkey-db || true",
-    "start:electron": "wait-on http://localhost:5173 && electron src/electron/main.js",
-    "start:project": "bash start-project.sh",
-    "start": "npm run start:project"
-  },
+"scripts": {
+  "dev": "vite",
+  "start:electron": "wait-on http://localhost:5173 && electron src/electron/main.js",
+  "start": "concurrently -n \"FRONT,ELECTRON\" -c \"cyan,magenta\" \"npm run dev\" \"npm run start:electron\""
+}
+,
   "dependencies": {
+    "axios": "^1.9.0",
     "bcrypt": "^5.1.1",
     "pg": "^8.15.6",
     "react": "^19.0.0",

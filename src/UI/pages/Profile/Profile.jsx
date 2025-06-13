@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useRef } from "react";
 import "./Profile.scss";
 import { useUser } from "../../context/UserContext/UserProvider.jsx";
+import { get, patch } from "../../hooks/requests";
+import { API_ROUTES } from "../../hooks/routes";
 
 const Profile = () => {
   const { user, logout } = useUser();
@@ -13,61 +15,79 @@ const Profile = () => {
 
   useEffect(() => {
     if (!user) return;
-
+  
     if (!name && !avatar) {
       setName(user.name);
       setAvatar(user.avatar);
-      setInputData(user.name)
+      setInputData(user.name);
     }
-
+  
     const fetchData = async () => {
       const saved = JSON.parse(localStorage.getItem("user"));
-      const response = await window.api.call("getUserById", [saved.id]);
-      const responseRank = await window.api.call("getBestUserRank", [saved.id]);
-
-      if (responseRank.success) setRank(responseRank.data.rank);
+      const response = await get(API_ROUTES.profile.get(saved.id));
+      console.log(response.data);
+      
+  
       if (response.success) {
-        setEmail(response.data.email);
-        setAvatar(response.data.avatar);
+        const { email, avatar, rank, name } = response.data;
+        setEmail(email);
+        setAvatar(avatar);
+        setName(name);
+        setInputData(name);
+        if (rank !== undefined) {
+          setRank(rank);
+        }
+      } else {
+        console.error("Ошибка при получении профиля:", response.error);
       }
     };
+  
     fetchData();
-  }, [name, avatar, user]);
+  }, [user]);
+  
 
   const handleNameChange = async () => {
-    const res = await window.api.call("updateUserName", [user.id, inputData]);
+    
+    const res = await patch(API_ROUTES.profile.updateName(user.id), {
+      newName: inputData,
+    });
+    
+
+    
     if (res.success) {
       setIsEditingName(false);
       setName(inputData);
-      user.name = inputData
+      user.name = inputData;
       localStorage.setItem("user", JSON.stringify({ ...user, name: inputData }));
+    } else {
+      console.error("Ошибка обновления имени:", res.error);
     }
   };
+  
 
   const handleAvatarChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
-
+  
     const reader = new FileReader();
     reader.onloadend = async () => {
       const base64 = reader.result;
-
-      // 1. Сохраняем локально
       setAvatar(base64);
-
-      // 2. Отправка в БД через API, если нужно:
-
-      const res = await window.api.call("updateUserAvatar", [user.id, base64]);
+  
+      const res = await patch(API_ROUTES.profile.updateAvatar(user.id), {
+        avatar: base64,
+      });
+  
       if (res.success) {
-        localStorage.setItem(
-          "user",
-          JSON.stringify({ ...user, avatar: base64 })
-        );
+        localStorage.setItem("user", JSON.stringify({ ...user, avatar: base64 }));
+      } else {
+        console.error("Ошибка обновления аватарки:", res.error);
       }
     };
-
+  
     reader.readAsDataURL(file);
   };
+  
 
   return (
     <div className="profile">

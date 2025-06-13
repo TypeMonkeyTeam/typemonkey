@@ -17,50 +17,66 @@ const Authorization = () => {
   };
 
   const handleSubmit = async (e) => {
-	e.preventDefault();
-	const email = emailRef.current.value.trim();
-	const password = passwordRef.current.value;
-	const confirmPassword = confirmRef.current?.value;
-  
-	if (!email || !password) {
-	  setErrorMessage("The email address or password did not work.");
-	  return;
-	}
-  
-	if (isRegister) {
-	  if (!confirmPassword) {
-		setErrorMessage("Please confirm your password.");
-		return;
-	  }
-	  if (password !== confirmPassword) {
-		setErrorMessage("Passwords don't match.");
-		return;
-	  }
-  
-	  const response = await register({ email, password });
-	  if (!response.success) {
-		setErrorMessage(response.error || "Registration failed.");
-		return;
-	  }
-  
-	  // Успешно зарегистрирован — логин
-	  await login({ email, password });
-	} else {
-	  const response = await login({ email, password });
-	  if (!response.success) {
-		setErrorMessage(response.error || "Login failed.");
-		return;
-	  }
-	}
-  
-	setErrorMessage("");
-	emailRef.current.value = "";
-	passwordRef.current.value = "";
-	if (confirmRef.current) confirmRef.current.value = "";
-  
-	navigate("/main");
+    e.preventDefault();
+
+    const email = emailRef.current.value.trim();
+    const password = passwordRef.current.value;
+    const confirmPassword = confirmRef.current?.value;
+
+    if (!email || !password) {
+      setErrorMessage("The email address or password did not work.");
+      return;
+    }
+
+    if (isRegister) {
+      if (!confirmPassword) {
+        setErrorMessage("Please confirm your password.");
+        return;
+      }
+      if (password !== confirmPassword) {
+        setErrorMessage("Passwords don't match.");
+        return;
+      }
+    }
+
+    try {
+      let response;
+
+      if (isRegister) {
+        response = await register({ email, password });
+
+        if (!response.success) {
+          setErrorMessage(response.error || "Registration failed.");
+          return;
+        }
+
+        response = await login({ email, password });
+
+        if (!response.success) {
+          setErrorMessage(
+            response.error || "Auto-login failed after registration."
+          );
+          return;
+        }
+      } else {
+        response = await login({ email, password });
+
+        if (!response.success) {
+          setErrorMessage(response.error || "Login failed.");
+          return;
+        }
+      }
+
+      setErrorMessage("");
+      emailRef.current.value = "";
+      passwordRef.current.value = "";
+      if (confirmRef.current) confirmRef.current.value = "";
+
+    } catch (err) {
+      console.error("Unexpected error:", err);
+      setErrorMessage("Something went wrong. Please try again later.");
+    }
   };
-  
 
   return (
     <div className="authorization-wrapper">
