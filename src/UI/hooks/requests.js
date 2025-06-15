@@ -13,7 +13,7 @@ const api = axios.create({
   },
 });
 
-// 📌 Установка access token в каждый запрос
+//  Установка access token в каждый запрос
 api.interceptors.request.use((config) => {
   if (accessToken) {
     config.headers.Authorization = `Bearer ${accessToken}`;
@@ -21,7 +21,7 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// 🔄 Автообновление access token при 401 ошибке
+// Автообновление access token при 401 ошибке
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
@@ -56,7 +56,7 @@ api.interceptors.response.use(
   }
 );
 
-// 🧠 Универсальный метод для использования в компонентах
+//  Универсальный метод для использования в компонентах
 const handleRequest = async (method, endpoint, data = null) => {
   try {
     let response;

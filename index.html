@@ -1,14 +1,26 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/png" href="/monkey.png" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>TypeMonkey</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <div id="popup-root"></div>
-    <script type="module" src="/src/UI/main.jsx"></script>
-  </body>
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/png" href="/monkey.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TypeMonkey</title>
+  <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self';
+    script-src 'self';
+    style-src 'self' 'unsafe-inline';
+    img-src 'self' data:;
+    font-src 'self';
+    connect-src 'self' http://localhost:5173 ws://localhost:5173 http://localhost:8080;
+" />
+
+</head>
+
+<body>
+  <div id="root"></div>
+  <div id="popup-root"></div>
+  <script type="module" src="/src/UI/main.jsx"></script>
+</body>
+
 </html>

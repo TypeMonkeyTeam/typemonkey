@@ -49,7 +49,6 @@ const Main = () => {
     }`;
     
 
-    
     // ⚠️ Один запрос, бэк сам решит, обновлять ли или вставлять
     const res = await post(API_ROUTES.record.submit, {
       userId: user.id,
@@ -59,6 +58,7 @@ const Main = () => {
       characters,
       language,
     });
+
 
   
     if (!res.success) {

@@ -78,6 +78,15 @@ export default function TypeArea({
     }
   };
 
+  const shuffleArray = (array) => {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+  };
+
   const handleKeyDown = (e) => {
     if (isFinished) return
 
@@ -197,18 +206,20 @@ export default function TypeArea({
   useEffect(() => {
     const loadJson = async () => {
       const data = await import(`../../data/${language}/data.json`);
-      setJson(data.default);
+      const shuffledWords = shuffleArray(data.default.words);
+      setJson({ words: shuffledWords });
     };
+  
     loadJson();
-
+  
     document.addEventListener("mousedown", handleClickOutside);
     document.addEventListener("keydown", handleKeyDown);
-
+  
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [isFinished]);
+  }, [isFinished, language]);
 
   useLayoutEffect(() => {
     if (!json) return;

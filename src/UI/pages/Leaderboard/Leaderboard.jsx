@@ -157,6 +157,7 @@ const Leaderboard = () => {
         const endpoint = `${API_ROUTES.leaderboard.all}?&time=${activeTime}&language=${activeLang}&metric=${activeMetric}`;
         const res = await get(endpoint);
         
+        
         if(res.success) {
           setUserRecords(res.data ?? []);
         } else  {

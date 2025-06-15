@@ -6,12 +6,21 @@ import CloseIcon from "../../assets/icons/Close";
 const Header = () => {
 
   const close = () => {
-    window.WindowAPI.closeWin();
+    if (window.electronAPI?.closeWindow) {
+      window.electronAPI.closeWindow();
+    } else {
+      console.warn("electronAPI.closeWindow is not available");
+    }
   };
-
+  
   const minimize = () => {
-    window.WindowAPI.minimizeWin();
+    if (window.electronAPI?.minimizeWindow) {
+      window.electronAPI.minimizeWindow();
+    } else {
+      console.warn("electronAPI.minimizeWindow is not available");
+    }
   };
+  
 
   return (
     <div className="header">
