@@ -32,7 +32,6 @@ const Main = () => {
     }
   
     const user = JSON.parse(localStorage.getItem("user"));
-    console.log("Пользователь:", user);
     
     if (!user || !user.id) {
       console.error("Пользователь не найден или некорректен");
@@ -66,17 +65,6 @@ const Main = () => {
       console.error("Ошибка отправки рекорда:", res.error);
       return null;
     }
-
-    console.log("Новый рекорд:", {
-      wpm,
-      accuracy,
-      characters,
-      time,
-      language,
-      avatar: user.avatar,
-      rank: res.data.rank, // напрямую из API
-      updated: res.data.updated, // пусть бек вернёт updated (true/false)
-    });
     
   
     return {
@@ -111,7 +99,6 @@ const Main = () => {
 
   const finish = async () => {
     const record = await calculateTypingStats();
-    console.log(record);
     
     setIsFinished(true);
     setIsStarted(false);

@@ -126,7 +126,6 @@ const LeaderboardPanel = ({ records, currentUserId, onDelete }) => {
         </div>
         <div className="records">
           {records.map((record, index) => {
-            console.log(record);
             
             return <LeaderboardRow
               key={record.id}
@@ -176,7 +175,6 @@ const Leaderboard = () => {
   const handleDelete = async (recordId) => {
     try {
       const res = await del(API_ROUTES.leaderboard.delete(recordId)); 
-      console.log("Результат удаления:", res);
 
       if (!res.success) {
         alert(res.error || "Ошибка при удалении");

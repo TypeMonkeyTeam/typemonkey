@@ -4,13 +4,20 @@ import { useNavigate } from "react-router-dom";
 import Avatar from "../../assets/avatar.png";
 import { post } from "../../hooks/requests";
 import {API_ROUTES} from "../../hooks/routes";
+import { setLogoutHandler } from "../../helpers/authHelper";
+
 export const UserProvider = ({ children }) => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
 
   useEffect(() => {
     const saved = localStorage.getItem("user");
-    saved ? setUser(JSON.parse(saved)) : navigate("/");
+    if (saved) {
+      setUser(JSON.parse(saved));
+    } else if (!user) {
+      navigate("/");
+    }
+    setLogoutHandler(logout);
   }, []);
 
   const login = async (userData) => {
@@ -21,11 +28,12 @@ export const UserProvider = ({ children }) => {
   
     if (response.success) {
       const userObj = {
-        id: response.data.id,
-        name: response.data.name,
-        avatar: response.data.avatar,
+        id: response.data.user.id,
+        name: response.data.user.name,
+        avatar: response.data.user.avatar,
       };
       localStorage.setItem("user", JSON.stringify(userObj));
+      localStorage.setItem("access_token", response.data.access_token);
       setUser(userObj);
       navigate("/main");
     } else {
@@ -43,13 +51,15 @@ export const UserProvider = ({ children }) => {
       password: userData.password,
       avatar: Avatar,
     });
+    
     if (response.success) {
       const userObj = {
-        id: response.data.id,
-        name: response.data.name,
-        avatar: response.data.avatar,
+        id: response.data.user.id,
+        name: response.data.user.name,
+        avatar: response.data.user.avatar,
       };
       localStorage.setItem("user", JSON.stringify(userObj));
+      localStorage.setItem("access_token", response.data.access_token);
       setUser(userObj);
       navigate("/main");
     } else {
@@ -58,8 +68,15 @@ export const UserProvider = ({ children }) => {
     return response.status;
   };
 
-  const logout = () => {
+  const logout = async () => {
+    try {
+      await post(API_ROUTES.auth.logout);
+    } catch (err) {
+      console.error("Ошибка при logout:", err);
+    }
+  
     localStorage.removeItem("user");
+    localStorage.removeItem("access_token");
     setUser(null);
     navigate("/");
   };

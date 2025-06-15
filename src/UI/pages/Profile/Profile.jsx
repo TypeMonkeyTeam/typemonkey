@@ -25,7 +25,6 @@ const Profile = () => {
     const fetchData = async () => {
       const saved = JSON.parse(localStorage.getItem("user"));
       const response = await get(API_ROUTES.profile.get(saved.id));
-      console.log(response.data);
       
   
       if (response.success) {
