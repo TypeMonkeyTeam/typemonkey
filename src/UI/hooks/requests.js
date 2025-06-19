@@ -2,7 +2,7 @@ import axios from "axios";
 import { API_ROUTES } from "./routes";
 import { logout } from "../helpers/authHelper";
 
-const BASE_URL = "http://localhost:8080";
+const BASE_URL = "https://typemonkey.ru";
 let accessToken = localStorage.getItem("access_token");
 
 const api = axios.create({
