@@ -7,13 +7,11 @@ let accessToken = localStorage.getItem("access_token");
 
 const api = axios.create({
   baseURL: BASE_URL,
-  withCredentials: true, // Чтобы refresh_token передавался в куках
-  headers: {
-    "Content-Type": "application/json",
-  },
+  withCredentials: true, // для refresh_token в куках
+  headers: {},
 });
 
-//  Установка access token в каждый запрос
+//  Добавляем access_token в каждый запрос
 api.interceptors.request.use((config) => {
   if (accessToken) {
     config.headers.Authorization = `Bearer ${accessToken}`;
@@ -21,7 +19,7 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Автообновление access token при 401 ошибке
+//  Автообновление access_token при 401
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
@@ -35,19 +33,14 @@ api.interceptors.response.use(
       originalRequest._retry = true;
       try {
         const res = await api.post(API_ROUTES.auth.refresh);
-
         accessToken = res.data.access_token;
         localStorage.setItem("access_token", accessToken);
 
         originalRequest.headers.Authorization = `Bearer ${accessToken}`;
-        return api(originalRequest); // Повторяем оригинальный запрос
+        return api(originalRequest); // повтор запроса
       } catch (refreshErr) {
         console.error("Ошибка обновления токена:", refreshErr);
-
-        // 🧹 Очищаем access_token и можно редиректить
         logout();
-
-        // Дополнительно: можно вызвать logout() тут, если он есть
         return Promise.reject(refreshErr);
       }
     }
@@ -56,23 +49,34 @@ api.interceptors.response.use(
   }
 );
 
-//  Универсальный метод для использования в компонентах
-const handleRequest = async (method, endpoint, data = null) => {
+// 🔧 Универсальный запрос
+const handleRequest = async (method, endpoint, data = null, options = {}) => {
   try {
-    let response;
+    const config = {
+      headers: {
+        ...options.customHeaders,
+      },
+      params: options.params || {},
+    };
 
+    // Только для обычных данных — явно указываем Content-Type
+    if (!(data instanceof FormData)) {
+      config.headers["Content-Type"] = "application/json";
+    }
+
+    let response;
     switch (method) {
       case "get":
-        response = await api.get(endpoint);
+        response = await api.get(endpoint, config);
         break;
       case "post":
-        response = await api.post(endpoint, data);
+        response = await api.post(endpoint, data, config);
         break;
       case "patch":
-        response = await api.patch(endpoint, data);
+        response = await api.patch(endpoint, data, config);
         break;
       case "delete":
-        response = await api.delete(endpoint);
+        response = await api.delete(endpoint, config);
         break;
       default:
         throw new Error("Неподдерживаемый метод запроса");
@@ -84,7 +88,6 @@ const handleRequest = async (method, endpoint, data = null) => {
     };
   } catch (error) {
     console.error("API error:", error);
-
     return {
       success: false,
       error:
@@ -96,9 +99,17 @@ const handleRequest = async (method, endpoint, data = null) => {
   }
 };
 
-export const get = (endpoint) => handleRequest("get", endpoint);
-export const post = (endpoint, data) => handleRequest("post", endpoint, data);
-export const patch = (endpoint, data) => handleRequest("patch", endpoint, data);
-export const del = (endpoint) => handleRequest("delete", endpoint);
+// Экспорт удобных методов
+export const get = (endpoint, options = {}) =>
+  handleRequest("get", endpoint, null, options);
+
+export const post = (endpoint, data, options = {}) =>
+  handleRequest("post", endpoint, data, options);
+
+export const patch = (endpoint, data, options = {}) =>
+  handleRequest("patch", endpoint, data, options);
+
+export const del = (endpoint, options = {}) =>
+  handleRequest("delete", endpoint, null, options);
 
 export default api;

@@ -5,9 +5,23 @@ import path from "path";
 export default defineConfig({
   plugins: [react()],
   root: ".",
+  base: "./",
   build: {
-    outDir: path.resolve(__dirname, "dist"),
+    outDir: "dist",
     emptyOutDir: true,
+    rollupOptions: {
+      input: "index.html", // точка входа
+      external: [],         // сюда можно добавлять внешние зависимости, если нужно
+    },
+    // Эта опция помогает убедиться, что файлы из electron не попадут
+    commonjsOptions: {
+      exclude: [path.resolve(__dirname, "src/electron/**")],
+    },
+  },
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "./src"),
+    },
   },
   json: {
     namedExports: true,
@@ -15,5 +29,7 @@ export default defineConfig({
   },
   server: {
     port: 5173,
+    strictPort: true,
   },
 });
+

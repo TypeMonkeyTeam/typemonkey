@@ -18,7 +18,7 @@ export const API_ROUTES = {
   profile: {
     get: (id) => `/api/profile/${id}`,
     updateName: (id) => `/api/profile/${id}/update-name`,
-    updateAvatar: (id) => `/api/profile/${id}/update-avatar`,
+    uploadAvatar: (id) => `/api/profile/${id}/upload-avatar`,
   },
   leaderboard: {
     all: "/api/leaderboard/",

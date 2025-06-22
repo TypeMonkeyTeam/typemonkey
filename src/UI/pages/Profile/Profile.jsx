@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import "./Profile.scss";
 import { useUser } from "../../context/UserContext/UserProvider.jsx";
-import { get, patch } from "../../hooks/requests";
+import { get, patch, post } from "../../hooks/requests";
 import { API_ROUTES } from "../../hooks/routes";
 
 const Profile = () => {
@@ -10,23 +10,22 @@ const Profile = () => {
   const [email, setEmail] = useState(null);
   const [avatar, setAvatar] = useState(null);
   const [isEditingName, setIsEditingName] = useState(false);
-  const [inputData, setInputData] = useState(null)
+  const [inputData, setInputData] = useState(null);
   const [name, setName] = useState(null);
 
   useEffect(() => {
     if (!user) return;
-  
+
     if (!name && !avatar) {
       setName(user.name);
       setAvatar(user.avatar);
       setInputData(user.name);
     }
-  
+
     const fetchData = async () => {
       const saved = JSON.parse(localStorage.getItem("user"));
       const response = await get(API_ROUTES.profile.get(saved.id));
-      
-  
+
       if (response.success) {
         const { email, avatar, rank, name } = response.data;
         setEmail(email);
@@ -40,52 +39,77 @@ const Profile = () => {
         console.error("Ошибка при получении профиля:", response.error);
       }
     };
-  
+
     fetchData();
   }, [user]);
-  
 
   const handleNameChange = async () => {
-    
     const res = await patch(API_ROUTES.profile.updateName(user.id), {
       newName: inputData,
     });
-    
 
-    
     if (res.success) {
       setIsEditingName(false);
       setName(inputData);
       user.name = inputData;
-      localStorage.setItem("user", JSON.stringify({ ...user, name: inputData }));
+      localStorage.setItem(
+        "user",
+        JSON.stringify({ ...user, name: inputData })
+      );
     } else {
       console.error("Ошибка обновления имени:", res.error);
     }
   };
-  
 
-  const handleAvatarChange = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-  
-    const reader = new FileReader();
-    reader.onloadend = async () => {
-      const base64 = reader.result;
-      setAvatar(base64);
-  
-      const res = await patch(API_ROUTES.profile.updateAvatar(user.id), {
-        avatar: base64,
-      });
-  
-      if (res.success) {
-        localStorage.setItem("user", JSON.stringify({ ...user, avatar: base64 }));
-      } else {
-        console.error("Ошибка обновления аватарки:", res.error);
-      }
-    };
-  
-    reader.readAsDataURL(file);
-  };
+  //somechangesforpush
+const handleAvatarChange = async (e) => {
+  console.log("📤 handleAvatarChange сработал");
+
+  const file = e.target.files[0];
+  if (!file) {
+    console.warn("⚠️ Файл не выбран");
+    return;
+  }
+
+  // Надежно получаем email из разных источников
+  const localUser = JSON.parse(localStorage.getItem("user"));
+  const safeEmail = user?.email || email || localUser?.email;
+
+  if (!safeEmail) {
+    console.warn("⚠️ Email пользователя не найден");
+    return;
+  }
+
+  console.log("📁 Файл выбран:", file);
+  console.log("📧 Email:", safeEmail);
+
+  const formData = new FormData();
+  formData.append("avatar", file);
+  formData.append("email", safeEmail);
+
+  // Для отладки
+  for (const [key, value] of formData.entries()) {
+    console.log(`📦 ${key}:`, value);
+  }
+
+  const endpoint = API_ROUTES.profile.uploadAvatar(user.id);
+  console.log("📎 uploadAvatar endpoint:", endpoint);
+
+  const result = await post(endpoint, formData);
+
+  if (result.success && result.data.url) {
+    const avatarUrl = result.data.url;
+    console.log("✅ Аватар загружен:", avatarUrl);
+    setAvatar(avatarUrl);
+
+    // Обновим localStorage и контекст
+    const updatedUser = { ...user, avatar: avatarUrl };
+    localStorage.setItem("user", JSON.stringify(updatedUser));
+  } else {
+    console.error("❌ Ошибка загрузки:", result.error);
+  }
+};
+
   
 
   return (
@@ -126,7 +150,7 @@ const Profile = () => {
                     className="name-input"
                     value={inputData}
                     onChange={(e) => {
-                      setInputData(e.target.value)
+                      setInputData(e.target.value);
                     }}
                   />
                   <button className="check-btn" onClick={handleNameChange}>

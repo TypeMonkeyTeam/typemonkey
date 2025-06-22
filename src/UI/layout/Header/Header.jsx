@@ -26,7 +26,7 @@ const Header = () => {
     <div className="header">
       <div className="drag-area"></div>
       <div className="logo">
-        <img src="/monkey.png" alt="TypeMonkey" />
+        <img src="./monkey.png" alt="TypeMonkey" />
         TypeMonkey
       </div>
       <div className="controls">

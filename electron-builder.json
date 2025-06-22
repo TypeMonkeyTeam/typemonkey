@@ -1,0 +1,26 @@
+{
+  "appId": "com.typemonkey.app",
+  "productName": "TypeMonkey",
+  "files": [
+    "dist/**",
+    "src/electron/**",
+    "node_modules/**",
+    "package.json"
+  ],
+  "directories": {
+    "output": "release",
+    "buildResources": "public"
+  },
+  "mac": {
+    "target": "dmg",
+    "icon": "public/icons/icon.icns"
+  },
+  "win": {
+    "target": "nsis",
+    "icon": "public/icons/icon.ico"
+  },
+  "linux": {
+    "target": "deb",
+    "icon": "public/icons/icon.png"
+  }
+}

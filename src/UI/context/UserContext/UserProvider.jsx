@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import { UserContext } from "./UserContext";
 import { useNavigate } from "react-router-dom";
-import Avatar from "../../assets/avatar.png";
+
 import { post } from "../../hooks/requests";
 import {API_ROUTES} from "../../hooks/routes";
 import { setLogoutHandler } from "../../helpers/authHelper";
@@ -21,10 +21,12 @@ export const UserProvider = ({ children }) => {
   }, []);
 
   const login = async (userData) => {
+    
     const response = await post(API_ROUTES.auth.login, {
       email: userData.email,
       password: userData.password,
     });
+    
   
     if (response.success) {
       const userObj = {
@@ -49,8 +51,8 @@ export const UserProvider = ({ children }) => {
       name,
       email: userData.email,
       password: userData.password,
-      avatar: Avatar,
     });
+    
     
     if (response.success) {
       const userObj = {

@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import {
-  BrowserRouter,
+  HashRouter,
   Routes,
   Route,
   Navigate,
@@ -32,7 +32,7 @@ const PublicRoute = () => {
 };
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <BrowserRouter>
+  <HashRouter>
     <UserProvider>
       <PopupProvider>
         <Routes>
@@ -53,5 +53,5 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         </Routes>
       </PopupProvider>
     </UserProvider>
-  </BrowserRouter>
+  </HashRouter>
 );

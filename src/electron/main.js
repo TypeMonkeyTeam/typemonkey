@@ -15,7 +15,7 @@ function createWindow() {
     height: 700,
     resizable: false,
     frame: false,
-    icon: path.join(__dirname, "..", "..", "public", "monkey.png"),
+    icon: path.join(__dirname, "..", "..", "public", "icons", "icon.png"),
     webPreferences: {
       contextIsolation: true,
       nodeIntegration: false,
@@ -23,7 +23,24 @@ function createWindow() {
     },
   });
 
-  win.loadURL("http://localhost:5173");
+  win.loadFile(path.join(__dirname, "../../dist/index.html"));
+
+  // Запретить DevTools:
+  win.webContents.on("devtools-opened", () => {
+    win.webContents.closeDevTools();
+  });
+
+  // Перехват хоткеев, чтобы не открыть DevTools через клавиатуру:
+  win.webContents.on("before-input-event", (event, input) => {
+    // Ctrl+Shift+I или Cmd+Option+I или F12
+    if (
+      (input.control || input.meta) &&
+      (input.shift && (input.key.toLowerCase() === "i" || input.key.toLowerCase() === "j")) ||
+      input.key === "F12"
+    ) {
+      event.preventDefault();
+    }
+  });
 }
 
 app.setName("TypeMonkey");
