@@ -62,55 +62,41 @@ const Profile = () => {
   };
 
   //somechangesforpush
-const handleAvatarChange = async (e) => {
-  console.log("📤 handleAvatarChange сработал");
+  const handleAvatarChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) {
+      console.warn("⚠️ Файл не выбран");
+      return;
+    }
 
-  const file = e.target.files[0];
-  if (!file) {
-    console.warn("⚠️ Файл не выбран");
-    return;
-  }
+    // Надежно получаем email из разных источников
+    const localUser = JSON.parse(localStorage.getItem("user"));
+    const safeEmail = user?.email || email || localUser?.email;
 
-  // Надежно получаем email из разных источников
-  const localUser = JSON.parse(localStorage.getItem("user"));
-  const safeEmail = user?.email || email || localUser?.email;
+    if (!safeEmail) {
+      console.warn("⚠️ Email пользователя не найден");
+      return;
+    }
 
-  if (!safeEmail) {
-    console.warn("⚠️ Email пользователя не найден");
-    return;
-  }
+    const formData = new FormData();
+    formData.append("avatar", file);
+    formData.append("email", safeEmail);
 
-  console.log("📁 Файл выбран:", file);
-  console.log("📧 Email:", safeEmail);
+    const endpoint = API_ROUTES.profile.uploadAvatar(user.id);
 
-  const formData = new FormData();
-  formData.append("avatar", file);
-  formData.append("email", safeEmail);
+    const result = await post(endpoint, formData);
 
-  // Для отладки
-  for (const [key, value] of formData.entries()) {
-    console.log(`📦 ${key}:`, value);
-  }
+    if (result.success && result.data.url) {
+      const avatarUrl = result.data.url;
+      setAvatar(`${avatarUrl}?t=${Date.now()}`);
 
-  const endpoint = API_ROUTES.profile.uploadAvatar(user.id);
-  console.log("📎 uploadAvatar endpoint:", endpoint);
-
-  const result = await post(endpoint, formData);
-
-  if (result.success && result.data.url) {
-    const avatarUrl = result.data.url;
-    console.log("✅ Аватар загружен:", avatarUrl);
-    setAvatar(avatarUrl);
-
-    // Обновим localStorage и контекст
-    const updatedUser = { ...user, avatar: avatarUrl };
-    localStorage.setItem("user", JSON.stringify(updatedUser));
-  } else {
-    console.error("❌ Ошибка загрузки:", result.error);
-  }
-};
-
-  
+      // Обновим localStorage и контекст
+      const updatedUser = { ...user, avatar: avatarUrl };
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+    } else {
+      console.error("❌ Ошибка загрузки:", result.error);
+    }
+  };
 
   return (
     <div className="profile">
