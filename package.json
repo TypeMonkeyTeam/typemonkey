@@ -2,6 +2,10 @@
   "name": "typemonkey",
   "private": true,
   "version": "1.0.1",
+  "description": "TypeMonkey",
+  "author": {
+    "name": "TypeMonkeyTeam",
+    "email": "makhmudkhamidov5@gmail.com"},
   "type": "module",
   "productName": "TypeMonkey",
   "icon": "/public/monkey.png",
