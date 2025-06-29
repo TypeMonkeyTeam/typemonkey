@@ -36,4 +36,5 @@ jobs:
       - name: Publish release
         uses: softprops/action-gh-release@v1
         with:
-          files: release/**
+        token: ${{ secrets.GH_TOKEN }}
+        files: release/**
