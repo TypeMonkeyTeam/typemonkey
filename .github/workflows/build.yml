@@ -36,6 +36,7 @@ jobs:
         with:
           token: ${{ secrets.GH_TOKEN }}
           files: |
-            release/**/TypeMonkey*.dmg
-            release/**/TypeMonkey*.exe
-            release/**/TypeMonkey*.deb
+            release/**/*.deb
+            release/**/*.dmg
+            release/**/*.exe
+            release/**/*.yml
