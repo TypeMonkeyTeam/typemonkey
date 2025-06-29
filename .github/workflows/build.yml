@@ -11,7 +11,7 @@ jobs:
       matrix:
         os: [macos-latest, windows-latest, ubuntu-latest]
     runs-on: ${{ matrix.os }}
-
+    run: echo "token is $GH_TOKEN"
     env:
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
