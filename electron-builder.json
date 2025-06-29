@@ -11,6 +11,11 @@
     "output": "release",
     "buildResources": "public"
   },
+  "publish": {
+    "provider": "github",
+    "owner": "TypeMonkeyTeam",
+    "repo": "typemonkey"
+  },
   "mac": {
     "target": "dmg",
     "icon": "public/icons/icon.icns"
