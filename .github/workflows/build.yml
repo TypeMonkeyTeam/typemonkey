@@ -35,7 +35,7 @@ jobs:
           files: |
             release/**/*.dmg
             release/**/latest-mac.yml
-            release/**/*.exe
+            release/**/*TypeMonkey.Setup*.exe
             release/**/latest.yml
             release/**/*.deb
             release/**/latest-linux.yml
