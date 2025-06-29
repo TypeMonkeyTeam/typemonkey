@@ -28,8 +28,15 @@ jobs:
       - name: Build
         run: npm run dist
 
-      - name: Debug release files
-        run: find release -type f
+      - name: List release files
+        run: |
+          if [ "$RUNNER_OS" == "Windows" ]; then
+            Get-ChildItem -Recurse -File release
+          else
+            find release -type f
+          fi
+        shell: bash
+
 
       - name: Publish release
         uses: softprops/action-gh-release@v1
