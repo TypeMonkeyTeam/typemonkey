@@ -28,15 +28,17 @@ jobs:
       - name: Build
         run: npm run dist
 
-      - name: List release files
-        run: ls -R release
+      - name: Debug release files
+        run: find release -type f
 
       - name: Publish release
         uses: softprops/action-gh-release@v1
         with:
           token: ${{ secrets.GH_TOKEN }}
           files: |
-            release/**/*.deb
             release/**/*.dmg
+            release/**/latest-mac.yml
             release/**/*.exe
-            release/**/*.yml
+            release/**/latest.yml
+            release/**/*.deb
+            release/**/latest-linux.yml
