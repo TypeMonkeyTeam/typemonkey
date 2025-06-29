@@ -21,8 +21,11 @@ jobs:
         with:
           node-version: 20
 
-      - name: CHECH TOKEN
-        run: echo ${{secrets.GH_TOKEN}}
+      - name: Check token scope (debug)
+        run: |
+          curl -H "Authorization: token $GH_TOKEN" https://api.github.com/user
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
       - name: Install dependencies
         run: npm install
