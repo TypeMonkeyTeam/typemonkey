@@ -21,9 +21,11 @@ jobs:
         with:
           node-version: 20
 
+      - name: CHECH TOKEN
+        run: echo ${{secrets.GH_TOKEN}}
+
       - name: Install dependencies
         run: npm install
-        run: echo "token is $GH_TOKEN"
 
       - name: Build
         run: npm run dist
